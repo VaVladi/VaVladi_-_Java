@@ -1,0 +1,142 @@
+import java.io.IOException;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main
+{
+    public static void main (String[] args)
+    {
+        String strResult = "";
+        String strInput = "";
+        Scanner scanText = new Scanner(System.in);
+        String strInputReplaced = "";
+        strInput = scanText.nextLine();
+        strInputReplaced = strInput;
+        strInputReplaced = strInputReplaced.trim();
+        strInputReplaced = strInputReplaced.replace("*", " * ");
+        strInputReplaced = strInputReplaced.replace("/", " / ");
+        strInputReplaced = strInputReplaced.replace("+", " + ");
+        strInputReplaced = strInputReplaced.replace("-", " - ");
+        strInputReplaced = strInputReplaced.replace("i", "I");
+        strInputReplaced = strInputReplaced.replace("v", "V");
+        strInputReplaced = strInputReplaced.replace("x", "X");
+        //strInputReplaced = strInputReplaced.replace("l", "L");
+        //strInputReplaced = strInputReplaced.replace("c", "C");
+        //strInputReplaced = strInputReplaced.replace("d", "D");
+        //strInputReplaced = strInputReplaced.replace("m", "M");
+        strResult = calc(strInputReplaced);
+        System.out.print(" = " + strResult);
+        scanText.close();
+    }
+    public static String calc (String input)
+    {
+        String strResultCalc = "";
+        byte byteCounter;
+        byte byteOperand1 = 0;
+        byte byteOperand2 = 0;
+        byte byteResult = 0;
+        String strExceptionMessage00 = "Калькулятор не настолько умен, чтобы Вас всегда правильно понять, поэтому он отправился отдыхать. :)";
+        String strExceptionMessage01 = "Калькулятор излишне ленивый, чтобы совершать простейшие арифмеметические операции с числами более 10.";
+        String strExceptionMessage02 = "Калькулятор запутался со знаками операций и пошёл в библиотеку поизучать их получше.";
+        String strExceptionMessage03 = "Калькулятор отказывается отобразить результат римскими числами менее I. Не хочет делиться своим уникальным секретом.";
+        String[] arrRomanNumber = new String[100];
+        byte byte10pow0 = 0;
+        byte byte10pow1 = 0;
+        String [] strFragment = new String[4];
+        Scanner scanTextReplaced = new Scanner(input);
+        if (scanTextReplaced.hasNext()) {strFragment[0] = scanTextReplaced.next().trim();}
+        if (scanTextReplaced.hasNext()) {strFragment[1] = scanTextReplaced.next().trim();}
+        if (scanTextReplaced.hasNext()) {strFragment[2] = scanTextReplaced.next().trim();}
+        if (scanTextReplaced.hasNext()) {throw new RuntimeException(strExceptionMessage00);}
+        String [] patternString = new String[5];
+        patternString[0] = "^[ ]*[IVXivx]{1,4}[ ]*[*/+-][ ]*[IVXivx]{1,4}[ ]*$";
+        patternString[1] = "^[ ]*[1][0][ ]*[*/+-][ ]*[1][0][ ]*$";
+        patternString[2] = "^[ ]*[1-9][ ]*[*/+-][ ]*[1][0][ ]*$";
+        patternString[3] = "^[ ]*[1][0][ ]*[*/+-][ ]*[1-9][ ]*$";
+        patternString[4] = "^[ ]*[1-9][ ]*[*/+-][ ]*[1-9][ ]*$";
+        byte patternSovpal = 0;
+        for (byteCounter =  0; byteCounter <= 4; byteCounter++)
+        {
+            if (input.matches(patternString[byteCounter]))
+            {
+                patternSovpal = (byte)(byteCounter + 1);
+                break;
+            }
+        }
+        if (patternSovpal == 0) {throw new RuntimeException(strExceptionMessage00);}
+        switch(patternSovpal)
+        {
+            case 1:
+                // Заполнить массив римскими числами: arrRomanNumber[byteCounter] = str10pow1 + str10pow0. Затем передавать его в качестве параметра.
+                for (byteCounter =  0; byteCounter <= 99; byteCounter++)
+                {
+                    byte10pow0 = (byte) ((byteCounter + 1) % 10);
+                    byte10pow1 = (byte)(((byteCounter + 1) - byte10pow0) / 10);
+                    //I = 1; V = 5; X = 10; L = 50; C = 100; D = 500; M = 1 000.
+                    List<String> list10pow0 = List.of("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX");
+                    List<String> list10pow1 = List.of("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC", "C");
+                    arrRomanNumber[byteCounter] = list10pow1.get(byte10pow1) + list10pow0.get(byte10pow0);
+                }
+                byteOperand1 = GetRomanNumber(strFragment[0], arrRomanNumber);
+                byteOperand2 = GetRomanNumber(strFragment[2], arrRomanNumber);
+                if ((byteOperand1 <= 0) || (byteOperand2 <= 0) ||(byteOperand1 > 10) || (byteOperand2 > 10)){throw new RuntimeException(strExceptionMessage01);}
+                break;
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                Scanner scanText1 = new Scanner(strFragment[0]);
+                Scanner scanText2 = new Scanner(strFragment[2]);
+                if (scanText1.hasNextByte()){byteOperand1 = scanText1.nextByte();}
+                if (scanText2.hasNextByte()){byteOperand2 = scanText2.nextByte();}
+                break;
+        }
+        switch (strFragment[1])
+        {
+            case "*":
+                byteResult = (byte)(byteOperand1 * byteOperand2);
+                break;
+            case "/":
+                byteResult = (byte)(byteOperand1 / byteOperand2);
+                break;
+            case "+":
+                byteResult = (byte)(byteOperand1 + byteOperand2);
+                break;
+            case "-":
+                byteResult = (byte)(byteOperand1 - byteOperand2);
+                break;
+            default:
+                throw new RuntimeException(strExceptionMessage02);
+        }
+        if (patternSovpal == 1)
+        {
+            if (byteResult >= 1)
+            {
+                strResultCalc = GetRomanNumber(byteResult, arrRomanNumber);
+            }
+            else {throw new RuntimeException(strExceptionMessage03);}
+        }
+        if (patternSovpal != 1) {strResultCalc = Byte.toString(byteResult);}
+        return strResultCalc;
+    }
+    static void ThrowError(String strMessage)
+    {
+        try{throw new IOException();}
+        catch(Exception err){System.out.println(strMessage);}
+    }
+    static String GetRomanNumber (byte byteNumber, String [] arrRomanNumberGetString)
+    {
+        String strGetRomanNumber = "";
+        if (byteNumber >= 1) {strGetRomanNumber = arrRomanNumberGetString[byteNumber - 1];} else {strGetRomanNumber = "";}
+        return strGetRomanNumber;
+    }
+    static byte GetRomanNumber (String strNumber, String [] arrRomanNumberGetByte)
+    {
+        byte byteResult = 0;
+        for (byte byteCounterGRM =  0; byteCounterGRM <= 99; byteCounterGRM++)
+        {
+            if (arrRomanNumberGetByte[byteCounterGRM].compareToIgnoreCase(strNumber) == 0){byteResult = (byte)(byteCounterGRM + 1);break;} else {byteResult = 0;}
+        }
+        return byteResult;
+    }
+}
