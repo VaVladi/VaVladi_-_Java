@@ -1,5 +1,5 @@
 # VaVladi_Kalikuliator_Java
-//Консольное приложение на Java.
+//Консольное приложение на Java "Калькулятор IVXLCDM".
 
 import java.io.IOException;
 import java.util.List;
